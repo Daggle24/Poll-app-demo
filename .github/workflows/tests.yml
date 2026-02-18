@@ -54,7 +54,7 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - uses: microsoft/playwright-github-action@v1
+      - run: pnpm exec playwright install --with-deps
 
       - run: pnpm build
       - run: pnpm start &
