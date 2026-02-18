@@ -28,7 +28,7 @@ Edit `.env`:
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `DATABASE_URL` | Yes | PostgreSQL connection string, e.g. `postgresql://user:password@localhost:5432/pollapp` |
+| `DATABASE_URL` | Yes | PostgreSQL connection string. **Vercel + Supabase:** use the [Connection Pooler](https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler) URL (port 6543), not the direct URL (`db.*.supabase.co:5432`), or you may get P1001 in production. |
 | `NEXTAUTH_SECRET` | Yes | Random secret for NextAuth; generate with: `openssl rand -base64 32` |
 | `NEXTAUTH_URL` | Yes | App URL; use `http://localhost:3000` for local dev |
 | `RESEND_API_KEY` | No | [Resend](https://resend.com) API key for OTP emails. If empty, OTP codes are **logged to the terminal** (handy for local testing). |

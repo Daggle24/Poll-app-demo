@@ -46,6 +46,35 @@ The specification phase was executed using Anthropic Opus 4.6 to ensure high-qua
 
 ## Parallelized Execution via Sub-Agents
 
+
+                    ┌─────────────────┐
+                    │ setup-database  │  (Group 1 — 6 tasks)
+                    └────────┬────────┘
+                             │
+              ┌──────────────┼──────────────┐
+              ▼              ▼              ▼
+      ┌──────────┐   ┌──────────┐   ┌──────────────┐
+      │ poll-api │   │ auth-api │   │ ui-foundation│
+      │ Grp 2+9 │   │  Grp 3   │   │    Grp 4     │
+      │ 11 tasks │   │ 10 tasks │   │   6 tasks    │
+      └─────┬────┘   └────┬─────┘   └──────┬───────┘
+            │              │                │
+            └──────┬───────┘                │
+                   │        ┌───────────────┘
+                   ▼        ▼
+          ┌────────────────────┐
+          │  public-poll-ui    │  (Groups 5+6 — 14 tasks)
+          └────────┬───────────┘
+                   │
+          ┌────────────────────┐
+          │     admin-ui       │  (Groups 7+8 — 14 tasks)
+          └────────┬───────────┘
+                   │
+          ┌────────────────────┐
+          │    polish-qa       │  (Group 10 — 6 tasks)
+          └────────────────────┘
+
+
 To meet the requirement of completing the coding test within two hours, the workload was parallelized using specialized sub-agents assigned to each task group.
 
 Execution flow:
