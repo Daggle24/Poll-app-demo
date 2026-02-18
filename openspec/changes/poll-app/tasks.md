@@ -88,9 +88,9 @@
 
 ## 10. Polish & Validation
 
-- [ ] 10.1 Add client-side form validation on all forms (create poll, login, register, OTP)
-- [ ] 10.2 Add loading states with shadcn Spinner on all async actions
-- [ ] 10.3 Add error boundary components for graceful error handling
-- [ ] 10.4 Verify dark/light mode renders correctly across all pages
-- [ ] 10.5 Test mobile responsiveness on all views (poll vote, results, dashboard, auth pages)
-- [ ] 10.6 Add proper page metadata (title, description) for each route
+- [x] 10.1 Add client-side form validation on all forms (create poll, login, register, OTP)
+- [x] 10.2 Add loading states with shadcn Spinner on all async actions
+- [x] 10.3 Add error boundary components for graceful error handling
+- [x] 10.4 Verify dark/light mode renders correctly across all pages
+- [x] 10.5 Test mobile responsiveness on all views (poll vote, results, dashboard, auth pages)
+- [x] 10.6 Add proper page metadata (title, description) for each route

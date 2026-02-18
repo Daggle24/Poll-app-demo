@@ -105,6 +105,9 @@ importers:
       eslint-config-next:
         specifier: 16.1.6
         version: 16.1.6(@typescript-eslint/parser@8.56.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
+      next-openapi-gen:
+        specifier: ^0.10.0
+        version: 0.10.0
       shadcn:
         specifier: ^3.8.5
         version: 3.8.5(@types/node@20.19.33)(typescript@5.9.3)
@@ -3269,6 +3272,11 @@ packages:
         optional: true
       nodemailer:
         optional: true
+
+  next-openapi-gen@0.10.0:
+    resolution: {integrity: sha512-C1FukVhh9AWs1BgO6WtDu5hJyAwCCxBYyFZbFqGvkNt7qyCkRqk4WnmB4R4wBJLR7qclwRiZ1IN6fBjq8lRblg==}
+    engines: {node: '>=18.0.0'}
+    hasBin: true
 
   next-themes@0.4.6:
     resolution: {integrity: sha512-pZvgD5L0IEvX5/9GWyHMf3m8BKiVQwsCMHfoFosXtXBMnaS0ZnIJ9ST4b4NqLVKDEm8QBxoNNGNaBv2JNF6XNA==}
@@ -7583,6 +7591,18 @@ snapshots:
       '@auth/core': 0.41.0
       next: 16.1.6(@babel/core@7.29.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       react: 19.2.3
+
+  next-openapi-gen@0.10.0:
+    dependencies:
+      '@babel/parser': 7.29.0
+      '@babel/traverse': 7.29.0
+      '@babel/types': 7.29.0
+      commander: 14.0.3
+      fs-extra: 11.3.3
+      js-yaml: 4.1.1
+      ora: 8.2.0
+    transitivePeerDependencies:
+      - supports-color
 
   next-themes@0.4.6(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
     dependencies:
