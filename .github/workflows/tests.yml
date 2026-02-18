@@ -51,7 +51,14 @@ jobs:
         with:
           node-version: '20'
           cache: 'pnpm'
-
+      
+      - run: |
+          if [ -z "$E2E_TEST_OTP" ]; then
+            echo "E2E_TEST_OTP is empty"
+            exit 1
+          else
+            echo "E2E_TEST_OTP is set"
+          fi
       - run: pnpm install --frozen-lockfile
 
       - run: pnpm exec playwright install --with-deps
