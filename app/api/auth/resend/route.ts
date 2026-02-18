@@ -1,7 +1,13 @@
 import { apiServerError, apiValidationError } from '@/lib/api-utils'
 import { resendOtp } from '@/modules/auth/auth.service'
-import { resendSchema } from '@/modules/auth/auth.validators'
+import { resendSchema, authSuccessResponseSchema } from '@/modules/auth/auth.validators'
 
+/**
+ * Resend verification code
+ * @description Sends a new OTP to the given email (e.g. after login or register).
+ * @body resendSchema
+ * @response 200:authSuccessResponseSchema
+ */
 export async function POST (req: Request) {
   try {
     const body = await req.json()

@@ -70,6 +70,17 @@ Leave `RESEND_API_KEY` empty. When you register or log in, the **6-digit OTP is 
 5. **Public vote** — Open the share link in another browser or incognito. Vote once; you’ll see results and “You’ve already voted.” Refresh to see updated counts (SWR refreshes every few seconds).
 6. **Theme** — Use the theme toggle in the header to switch dark/light.
 
+## API documentation
+
+OpenAPI 3.0 docs are generated from the codebase (JSDoc + Zod schemas). To generate the spec and view the docs:
+
+```bash
+pnpm openapi:generate
+pnpm dev
+```
+
+Then open [http://localhost:3000/api-docs](http://localhost:3000/api-docs) to browse and try the API.
+
 ## Scripts
 
 | Command | Description |
@@ -78,6 +89,7 @@ Leave `RESEND_API_KEY` empty. When you register or log in, the **6-digit OTP is 
 | `pnpm build` | Production build |
 | `pnpm start` | Start production server |
 | `pnpm lint` | Run ESLint |
+| `pnpm openapi:generate` | Generate OpenAPI spec to `public/openapi.json` |
 | `pnpm prisma migrate dev` | Apply migrations (dev) |
 | `pnpm prisma studio` | Open Prisma Studio |
 

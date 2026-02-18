@@ -1,8 +1,14 @@
 import { getSession } from '@/lib/auth'
 import { apiServerError, apiUnauthorized, apiValidationError } from '@/lib/api-utils'
 import { createPoll } from '@/modules/poll/poll.service'
-import { createPollSchema } from '@/modules/poll/poll.validators'
+import { createPollSchema, createPollResponseSchema } from '@/modules/poll/poll.validators'
 
+/**
+ * Create a new poll
+ * @description Creates a poll with question and 2-5 options. Requires authentication.
+ * @body createPollSchema
+ * @response 201:createPollResponseSchema
+ */
 export async function POST (req: Request) {
   try {
     const session = await getSession()

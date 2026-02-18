@@ -1,7 +1,14 @@
 import { apiForbidden, apiServerError, apiValidationError } from '@/lib/api-utils'
 import { castVote } from '@/modules/poll/poll.service'
-import { voteSchema } from '@/modules/poll/poll.validators'
+import { voteSchema, voteSuccessResponseSchema, pollIdParamsSchema } from '@/modules/poll/poll.validators'
 
+/**
+ * Cast a vote on a poll
+ * @description Submit a vote for one option. Public; optional cookie/header for idempotency.
+ * @pathParams pollIdParamsSchema
+ * @body voteSchema
+ * @response 201:voteSuccessResponseSchema
+ */
 export async function POST (
   req: Request,
   { params }: { params: Promise<{ id: string }> }

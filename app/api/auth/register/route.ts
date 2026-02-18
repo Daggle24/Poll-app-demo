@@ -1,7 +1,13 @@
 import { apiServerError, apiValidationError } from '@/lib/api-utils'
 import { register } from '@/modules/auth/auth.service'
-import { registerSchema } from '@/modules/auth/auth.validators'
+import { registerSchema, authSuccessResponseSchema } from '@/modules/auth/auth.validators'
 
+/**
+ * Register a new admin
+ * @description Sends a verification code to the given email. Use verify endpoint to complete sign-in.
+ * @body registerSchema
+ * @response 200:authSuccessResponseSchema
+ */
 export async function POST (req: Request) {
   try {
     const body = await req.json()

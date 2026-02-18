@@ -1,7 +1,13 @@
 import { apiServerError, apiValidationError } from '@/lib/api-utils'
 import { login } from '@/modules/auth/auth.service'
-import { loginSchema } from '@/modules/auth/auth.validators'
+import { loginSchema, authSuccessResponseSchema } from '@/modules/auth/auth.validators'
 
+/**
+ * Request admin login (send OTP)
+ * @description Sends a verification code to the given email. Use verify endpoint with the code to sign in.
+ * @body loginSchema
+ * @response 200:authSuccessResponseSchema
+ */
 export async function POST (req: Request) {
   try {
     const body = await req.json()

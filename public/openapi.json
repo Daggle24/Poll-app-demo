@@ -1,0 +1,933 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "PollApp API",
+    "version": "1.0.0",
+    "description": "API for polls, voting, and admin auth."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local development server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "adminPollsResponseSchema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/adminPollListItemSchema"
+        }
+      },
+      "loginSchema": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Admin email address"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "authSuccessResponseSchema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          }
+        },
+        "required": [
+          "success"
+        ]
+      },
+      "registerSchema": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Admin email address"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "description": "Admin display name"
+          }
+        },
+        "required": [
+          "email",
+          "name"
+        ]
+      },
+      "resendSchema": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email to resend the OTP to"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "verifySchema": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email the OTP was sent to"
+          },
+          "code": {
+            "type": "string",
+            "minLength": 6,
+            "maxLength": 6,
+            "description": "6-digit verification code"
+          }
+        },
+        "required": [
+          "email",
+          "code"
+        ]
+      },
+      "verifyResponseSchema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "token": {
+            "type": "string",
+            "description": "Session token for sign-in"
+          }
+        },
+        "required": [
+          "success",
+          "token"
+        ]
+      },
+      "pollIdParamsSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Poll ID"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "voteSuccessResponseSchema": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          }
+        },
+        "required": [
+          "success"
+        ]
+      },
+      "pollResultsResponseSchema": {
+        "type": "object",
+        "properties": {
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "voteCount": {
+                  "type": "number"
+                },
+                "percentage": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id",
+                "text",
+                "voteCount",
+                "percentage"
+              ]
+            }
+          },
+          "totalVotes": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "options",
+          "totalVotes"
+        ]
+      },
+      "createPollResponseSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "question": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "text"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "question",
+          "isActive",
+          "createdAt",
+          "options"
+        ]
+      },
+      "voteSchema": {
+        "type": "object",
+        "properties": {
+          "optionId": {
+            "type": "string",
+            "minLength": 1,
+            "description": "ID of the option being voted for"
+          }
+        },
+        "required": [
+          "optionId"
+        ]
+      },
+      "createPollSchema": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "Poll question text"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100,
+              "description": "Option text"
+            },
+            "minItems": 2,
+            "maxItems": 5,
+            "description": "Between 2 and 5 option strings"
+          }
+        },
+        "required": [
+          "question",
+          "options"
+        ]
+      },
+      "RegisterInput": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Admin email address"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "description": "Admin display name"
+          }
+        },
+        "required": [
+          "email",
+          "name"
+        ]
+      },
+      "LoginInput": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Admin email address"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "VerifyInput": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email the OTP was sent to"
+          },
+          "code": {
+            "type": "string",
+            "minLength": 6,
+            "maxLength": 6,
+            "description": "6-digit verification code"
+          }
+        },
+        "required": [
+          "email",
+          "code"
+        ]
+      },
+      "ResendInput": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email to resend the OTP to"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "adminPollListItemSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "question": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "_count": {
+            "type": "object",
+            "properties": {
+              "votes": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "votes"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "question",
+          "isActive",
+          "createdAt",
+          "_count"
+        ]
+      },
+      "CreatePollInput": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "Poll question text"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100,
+              "description": "Option text"
+            },
+            "minItems": 2,
+            "maxItems": 5,
+            "description": "Between 2 and 5 option strings"
+          }
+        },
+        "required": [
+          "question",
+          "options"
+        ]
+      },
+      "VoteInput": {
+        "type": "object",
+        "properties": {
+          "optionId": {
+            "type": "string",
+            "minLength": 1,
+            "description": "ID of the option being voted for"
+          }
+        },
+        "required": [
+          "optionId"
+        ]
+      }
+    },
+    "responses": {
+      "400": {
+        "description": "Bad Request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Invalid request parameters"
+                },
+                "code": {
+                  "type": "string",
+                  "example": "400"
+                }
+              }
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Authentication required"
+                },
+                "code": {
+                  "type": "string",
+                  "example": "401"
+                }
+              }
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Access denied"
+                },
+                "code": {
+                  "type": "string",
+                  "example": "403"
+                }
+              }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Not Found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Resource not found"
+                },
+                "code": {
+                  "type": "string",
+                  "example": "404"
+                }
+              }
+            }
+          }
+        }
+      },
+      "409": {
+        "description": "Conflict",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Resource already exists"
+                },
+                "code": {
+                  "type": "string",
+                  "example": "409"
+                }
+              }
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal Server Error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "An unexpected error occurred"
+                },
+                "code": {
+                  "type": "string",
+                  "example": "500"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/admin/polls": {
+      "get": {
+        "operationId": "get-admin-polls",
+        "summary": "List polls for the authenticated admin",
+        "description": "Returns all polls created by the current admin, with vote counts. Requires authentication.",
+        "tags": [
+          "Admin"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/adminPollsResponseSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "operationId": "post-auth-login",
+        "summary": "Request admin login (send OTP)",
+        "description": "Sends a verification code to the given email. Use verify endpoint with the code to sign in.",
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/loginSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/authSuccessResponseSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "operationId": "post-auth-register",
+        "summary": "Register a new admin",
+        "description": "Sends a verification code to the given email. Use verify endpoint to complete sign-in.",
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/registerSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/authSuccessResponseSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/auth/resend": {
+      "post": {
+        "operationId": "post-auth-resend",
+        "summary": "Resend verification code",
+        "description": "Sends a new OTP to the given email (e.g. after login or register).",
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/resendSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/authSuccessResponseSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/auth/verify": {
+      "post": {
+        "operationId": "post-auth-verify",
+        "summary": "Verify OTP and get session token",
+        "description": "Validates the 6-digit code and returns a token for credential sign-in.",
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/verifySchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/verifyResponseSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/polls": {
+      "post": {
+        "operationId": "post-polls",
+        "summary": "Create a new poll",
+        "description": "Creates a poll with question and 2-5 options. Requires authentication.",
+        "tags": [
+          "Polls"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/createPollSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/createPollResponseSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/polls/{id}": {
+      "get": {
+        "operationId": "get-polls-{id}",
+        "summary": "Get a poll by ID",
+        "description": "Returns a single poll with its options. Public.",
+        "tags": [
+          "Polls"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string",
+              "description": "Poll ID"
+            },
+            "required": true,
+            "description": "Poll ID",
+            "example": "123"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/createPollResponseSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/polls/{id}/close": {
+      "patch": {
+        "operationId": "patch-polls-{id}-close",
+        "summary": "Close a poll",
+        "description": "Marks the poll as closed (no more votes). Requires authentication and poll ownership.",
+        "tags": [
+          "Polls"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string",
+              "description": "Poll ID"
+            },
+            "required": true,
+            "description": "Poll ID",
+            "example": "123"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/voteSuccessResponseSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/polls/{id}/results": {
+      "get": {
+        "operationId": "get-polls-{id}-results",
+        "summary": "Get poll results",
+        "description": "Returns vote counts and percentages per option. Public.",
+        "tags": [
+          "Polls"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string",
+              "description": "Poll ID"
+            },
+            "required": true,
+            "description": "Poll ID",
+            "example": "123"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/pollResultsResponseSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/polls/{id}/vote": {
+      "post": {
+        "operationId": "post-polls-{id}-vote",
+        "summary": "Cast a vote on a poll",
+        "description": "Submit a vote for one option. Public; optional cookie/header for idempotency.",
+        "tags": [
+          "Polls"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string",
+              "description": "Poll ID"
+            },
+            "required": true,
+            "description": "Poll ID",
+            "example": "123"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/voteSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/voteSuccessResponseSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    }
+  }
+}

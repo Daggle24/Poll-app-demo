@@ -1,9 +1,15 @@
 import { apiServerError, apiValidationError } from '@/lib/api-utils'
 import { setToken } from '@/lib/auth-token-store'
 import { verifyOtp } from '@/modules/auth/auth.service'
-import { verifySchema } from '@/modules/auth/auth.validators'
+import { verifySchema, verifyResponseSchema } from '@/modules/auth/auth.validators'
 import { randomBytes } from 'node:crypto'
 
+/**
+ * Verify OTP and get session token
+ * @description Validates the 6-digit code and returns a token for credential sign-in.
+ * @body verifySchema
+ * @response 200:verifyResponseSchema
+ */
 export async function POST (req: Request) {
   try {
     const body = await req.json()
