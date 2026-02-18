@@ -64,10 +64,10 @@ Leave `RESEND_API_KEY` empty. When you register or log in, the **6-digit OTP is 
 ### Flow to try
 
 1. **Landing** — [http://localhost:3000](http://localhost:3000)
-2. **Admin sign up** — Go to **Login** or **Register**, enter email (and name for register). You’ll be sent to the verify page; enter the OTP from the email (or from the terminal if no Resend key).
-3. **Dashboard** — After verify, you’re in the admin dashboard. Create a poll (question + 2–5 options).
+2. **Admin sign up** — Go to **Login** or **Register**, enter email (and name for register). You'll be sent to the verify page; enter the OTP from the email (or from the terminal if no Resend key).
+3. **Dashboard** — After verify, you're in the admin dashboard. Create a poll (question + 2–5 options).
 4. **Poll detail** — Open a poll, use **Copy share link**, then **Close poll** (with confirmation) if you want.
-5. **Public vote** — Open the share link in another browser or incognito. Vote once; you’ll see results and “You’ve already voted.” Refresh to see updated counts (SWR refreshes every few seconds).
+5. **Public vote** — Open the share link in another browser or incognito. Vote once; you'll see results and "You've already voted." Refresh to see updated counts (SWR refreshes every few seconds).
 6. **Theme** — Use the theme toggle in the header to switch dark/light.
 
 ## API documentation
@@ -81,6 +81,82 @@ pnpm dev
 
 Then open [http://localhost:3000/api-docs](http://localhost:3000/api-docs) to browse and try the API.
 
+## Automated tests
+
+### Unit tests
+
+Run all unit tests (Vitest):
+
+```bash
+pnpm test
+```
+
+With coverage:
+
+```bash
+pnpm test:coverage
+```
+
+Tests cover poll and auth validators, and poll and auth services (with mocked repositories). No database or email is required for unit tests.
+
+### E2E tests
+
+E2E tests use **Playwright** and **Cucumber** (Gherkin). They run against a **running instance** of the app and use the **same database** as that instance (no mocks). So if you run `pnpm dev` with your normal `.env`, E2E hits your real DB.
+
+1. Start the app (e.g. `pnpm dev`).
+2. Optionally set the base URL (default is `http://localhost:3000`):
+   ```bash
+   export BASE_URL=http://localhost:3000
+   ```
+3. Run E2E:
+   ```bash
+   pnpm test:e2e
+   ```
+
+**Pre-seeding the database for E2E**
+
+To get passing public-voting scenarios, create a test poll and set its ID:
+
+```bash
+pnpm prisma db seed
+```
+
+The seed creates an E2E test admin (`e2e@example.com`) and one **active** poll, then prints something like:
+
+```
+Created E2E poll: clxx...
+Set in your environment:
+  export E2E_POLL_ID=clxx...
+```
+
+Set that in your environment (or `.env`) and run E2E again. For "closed poll" scenarios, use a poll you have closed in the app (or create a second poll, close it, and set `E2E_CLOSED_POLL_ID` if you add support for it).
+
+**Deterministic OTP for CI / automated admin login**
+
+Admin E2E scenarios need to log in via OTP. To make this fully automated (no manual code-grabbing), the auth service supports a **deterministic OTP mode**:
+
+1. Set `E2E_TEST_OTP` in the **server** `.env` (e.g. `E2E_TEST_OTP=000000`).
+2. The E2E test steps read the same variable (defaults to `000000`) and fill the verify form automatically.
+3. Because the server generates the fixed OTP and the tests know it, login is zero-touch.
+
+**Never set `E2E_TEST_OTP` in production.** It is strictly for dev/CI environments.
+
+**Prerequisites for E2E:**
+
+- App is running at `BASE_URL`.
+- **Public voting**: set `E2E_POLL_ID` to an existing active poll ID (e.g. from `pnpm prisma db seed`). If unset, scenarios that need a valid poll fail with a clear message.
+- **Poll management**: set `E2E_TEST_OTP` in the server `.env` so admin login is automatic. Optionally set `E2E_ADMIN_EMAIL` (default `e2e@example.com`).
+
+**Run E2E with the browser visible**
+
+To watch the browser instead of headless:
+
+```bash
+E2E_HEADED=1 pnpm test:e2e
+```
+
+Playwright browsers are installed automatically when you run E2E; if needed, run `pnpm exec playwright install chromium` once.
+
 ## Scripts
 
 | Command | Description |
@@ -89,8 +165,12 @@ Then open [http://localhost:3000/api-docs](http://localhost:3000/api-docs) to br
 | `pnpm build` | Production build |
 | `pnpm start` | Start production server |
 | `pnpm lint` | Run ESLint |
+| `pnpm test` | Run unit tests (Vitest) |
+| `pnpm test:coverage` | Run unit tests with coverage |
+| `pnpm test:e2e` | Run E2E tests (Cucumber + Playwright); app must be running |
 | `pnpm openapi:generate` | Generate OpenAPI spec to `public/openapi.json` |
 | `pnpm prisma migrate dev` | Apply migrations (dev) |
+| `pnpm prisma db seed` | Seed DB (E2E test admin + poll; prints `E2E_POLL_ID`) |
 | `pnpm prisma studio` | Open Prisma Studio |
 
 ## Stack

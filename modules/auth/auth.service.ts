@@ -5,6 +5,7 @@ import * as repository from './auth.repository'
 const OTP_EXPIRY_MS = 10 * 60 * 1000 // 10 minutes
 
 function generateOtp () {
+  if (process.env.E2E_TEST_OTP?.length === 6) return process.env.E2E_TEST_OTP
   return Math.floor(100000 + Math.random() * 900000).toString()
 }
 
