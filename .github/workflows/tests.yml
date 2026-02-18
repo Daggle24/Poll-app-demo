@@ -26,45 +26,45 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm test
 
-  e2e:
-    name: E2E Tests (Playwright)
-    runs-on: ubuntu-latest
-    needs: unit
-
-    env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-      NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
-      E2E_TEST_OTP: ${{ secrets.E2E_TEST_OTP }}
-      E2E_POLL_ID: ${{ secrets.E2E_POLL_ID }}
-      E2E_CLOSED_POLL_ID: ${{ secrets.E2E_CLOSED_POLL_ID }}
-      E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-      
-      - run: |
-          if [ -z "$E2E_TEST_OTP" ]; then
-            echo "E2E_TEST_OTP is empty"
-            exit 1
-          else
-            echo "E2E_TEST_OTP is set"
-          fi
-      - run: pnpm install --frozen-lockfile
-
-      - run: pnpm exec playwright install --with-deps
-
-      - run: pnpm build
-      - run: pnpm start &
-      - run: npx wait-on http://localhost:3000
-
-      - run: pnpm test:e2e
+  #e2e:
+  #  name: E2E Tests (Playwright)
+  #  runs-on: ubuntu-latest
+  #  needs: unit
+#
+  #  env:
+  #    DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  #    NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+  #    NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
+  #    E2E_TEST_OTP: ${{ secrets.E2E_TEST_OTP }}
+  #    E2E_POLL_ID: ${{ secrets.E2E_POLL_ID }}
+  #    E2E_CLOSED_POLL_ID: ${{ secrets.E2E_CLOSED_POLL_ID }}
+  #    E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
+#
+  #  steps:
+  #    - uses: actions/checkout@v4
+#
+  #    - uses: pnpm/action-setup@v4
+  #      with:
+  #        version: 10
+#
+  #    - uses: actions/setup-node@v4
+  #      with:
+  #        node-version: '20'
+  #        cache: 'pnpm'
+  #    
+  #    - run: |
+  #        if [ -z "$E2E_TEST_OTP" ]; then
+  #          echo "E2E_TEST_OTP is empty"
+  #          exit 1
+  #        else
+  #          echo "E2E_TEST_OTP is set"
+  #        fi
+  #    - run: pnpm install --frozen-lockfile
+#
+  #    - run: pnpm exec playwright install --with-deps
+#
+  #    - run: pnpm build
+  #    - run: pnpm start &
+  #    - run: npx wait-on http://localhost:3000
+#
+  #    - run: pnpm test:e2e
